@@ -1,7 +1,7 @@
 {
   "name": "export_excel",
   "private": "true",
-  "version": "1.0.23",
+  "version": "1.0.30",
   "lcapIdeVersion": "3.10",
   "title": "导出表格",
   "description": "导出excel",

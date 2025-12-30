@@ -1,5 +1,5 @@
 <template>
-<div v-if="$env.VUE_APP_DESIGNER" :class="$style.root" ref="root" :border="border">
+<div v-if="$env.VUE_APP_DESIGNER" :class="[$style.root, line ? $style.withLine : null]" ref="root" :border="border">
     <div v-if="title" :class="$style.title" ref="title" :style="{ textAlign: titleAlignment }" vusion-slot-name="title" vusion-slot-name-edit="title">
         <slot name="title">{{ title }}</slot>
     </div>
@@ -119,7 +119,7 @@
         <div :class="$style.trdragGhost" ref="trDragGhost"></div>
     </div>
 </div>
-<div v-else :class="$style.root" ref="root" :border="border"
+<div v-else :class="[$style.root, line ? $style.withLine : null]" ref="root" :border="border"
     @dragend="onDragEnd($event)"
     @drop="onDrop($event)"
     @dragover="onRootDragover($event)"
@@ -3241,6 +3241,28 @@ export default {
 .root {
     position: relative;
     /* 不能加这句，会使分页器的 Select 无法显示！ overflow: hidden; */
+}
+
+.withLine :global(thead th) {
+    border-bottom: 1px solid var(--table-view-border-color);
+}
+
+.withLine :global(tbody td) {
+    border-bottom: 1px solid var(--table-view-border-color);
+}
+
+.withLine :global(tbody tr:last-child td) {
+    border-bottom: none;
+}
+
+.withLine :global(tr > th),
+.withLine :global(tr > td) {
+    border-right: 1px solid var(--table-view-border-color);
+}
+
+.withLine :global(tr > th:last-child),
+.withLine :global(tr > td:last-child) {
+    border-right: none;
 }
 
 .root[editable] td{

@@ -1,4 +1,4 @@
-export default function observe(element: HTMLElement, root: HTMLElement, callback: Function, marginBottom: number): IntersectionObserver {
+export default function observe(element: HTMLElement, root: HTMLElement, callback: Function, marginBottom: number): IntersectionObserver | null {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -6,19 +6,19 @@ export default function observe(element: HTMLElement, root: HTMLElement, callbac
     callback();
     return null;
   }
-  let io: IntersectionObserver = null;
+  let io: IntersectionObserver | null = null;
   try {
     io = new window.IntersectionObserver(entries => {
       const entry = entries[0];
       if (entry.isIntersecting) {
         callback();
-        io.unobserve(element);
+        io && io.unobserve(element);
       }
     }, {
       rootMargin: `0px 0px ${marginBottom}px 0px`,
       root
     });
-    io.observe(element);
+    io && io.observe(element);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

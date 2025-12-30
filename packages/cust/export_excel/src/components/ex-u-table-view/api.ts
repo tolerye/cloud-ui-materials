@@ -349,7 +349,7 @@ namespace extensions.export_excel.viewComponents {
       order: nasl.core.String;
       compare?: Function;
     } = {
-      field: undefined,
+      field: '',
       order: 'desc',
     };
     @Prop({
