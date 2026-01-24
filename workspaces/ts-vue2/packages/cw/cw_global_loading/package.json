@@ -1,10 +1,10 @@
 {
-  "name": "cw_cut_printview",
+  "name": "cw_global_loading",
   "private": "true",
-  "version": "1.2.0",
+  "version": "1.0.3",
   "lcapIdeVersion": "3.8",
-  "title": "分页打印组件",
-  "description": "分页打印组件",
+  "title": "全局loading",
+  "description": "全局loading",
   "main": "dist-theme/index.js",
   "module": "dist-theme/index.mjs",
   "files": [
@@ -25,16 +25,12 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.4",
-    "print-js": "^1.6.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@lcap/builder": "^1.6.1",
+    "@lcap/builder": "^1.6.2",
+    "@nasl/types": "^0.1.15",
     "@lcap/storybook-vue-vite": "^7.6.17",
     "@lcap/vite-plugin-vue2": "^1.0.0",
-    "@nasl/types": "^0.1.14",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",

@@ -1,10 +1,10 @@
 {
-  "name": "cw_cut_printview",
+  "name": "cw_office_sdk_new",
   "private": "true",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "lcapIdeVersion": "3.8",
-  "title": "分页打印组件",
-  "description": "分页打印组件",
+  "title": "新版文档SDK依赖库",
+  "description": "新版文档SDK依赖库",
   "main": "dist-theme/index.js",
   "module": "dist-theme/index.mjs",
   "files": [
@@ -26,15 +26,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "html2canvas": "^1.4.1",
+    "@babel/traverse": "^7.28.0",
+    "@js-preview/excel": "^1.7.14",
+    "axios": "^1.6.7",
+    "docx-preview": "0.1.20",
+    "downloadjs": "^1.4.7",
     "jspdf": "^3.0.4",
-    "print-js": "^1.6.0"
+    "panzoom": "^9.4.3",
+    "pdfjs-dist": "2.4.456",
+    "vue-pdf-embed": "1.2.1",
+    "vue-pinch-zoom": "^1.0.1"
   },
   "devDependencies": {
-    "@lcap/builder": "^1.6.1",
+    "@lcap/builder": "^1.6.2",
     "@lcap/storybook-vue-vite": "^7.6.17",
     "@lcap/vite-plugin-vue2": "^1.0.0",
-    "@nasl/types": "^0.1.14",
+    "@nasl/types": "^0.1.15",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",
