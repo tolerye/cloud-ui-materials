@@ -40,7 +40,8 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
         "expression": "!this.getAttribute('configurable')?.value"
       }],
       "additionalAttribute": {
-        ":useMask": false
+        ":useMask": false,
+        ":excelMode": false
       }
     }
   })
@@ -95,7 +96,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: 'undefined',
       description: '清除缓存，重新加载'
     })
-    reload(): void {}
+    reload(): void { }
     @Method({
       title: '带页码刷新',
       description: '保持页码，重新加载'
@@ -104,7 +105,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: '页数',
       description: '要刷新的页数'
     })
-    page?: nasl.core.Integer): void {}
+    page?: nasl.core.Integer): void { }
     @Method({
       title: 'undefined',
       description: '获取所有表格列的 field'
@@ -120,7 +121,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: '展开/折叠',
       description: 'true 展开 / false 折叠'
     })
-    expanded: nasl.core.Boolean, level: nasl.core.Integer = 0): void {}
+    expanded: nasl.core.Boolean, level: nasl.core.Integer = 0): void { }
     @Method({
       title: '展开某个节点',
       description: '树形表格展开'
@@ -131,7 +132,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
     value: V, @Param({
       title: '展开/折叠'
     })
-    expanded: nasl.core.Boolean): void {}
+      expanded: nasl.core.Boolean): void { }
 
     // @Method({
     //   title: '添加一行数据',
@@ -166,15 +167,15 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: 'undefined',
       description: '排序字段'
     })
-    sort?: nasl.core.String, @Param({
-      title: 'undefined',
-      description: '排序顺序'
-    })
-    order?: 'asc' | 'desc', excludeColumns: nasl.collection.List<nasl.core.String> = [], @Param({
-      title: 'undefined',
-      description: '是否带样式'
-    })
-    includeStyles?: nasl.core.Boolean): void {}
+      sort?: nasl.core.String, @Param({
+        title: 'undefined',
+        description: '排序顺序'
+      })
+      order?: 'asc' | 'desc', excludeColumns: nasl.collection.List<nasl.core.String> = [], @Param({
+        title: 'undefined',
+        description: '是否带样式'
+      })
+      includeStyles?: nasl.core.Boolean): void { }
     @Method({
       title: 'undefined',
       description: '重制编辑列的编辑状态为非编辑态'
@@ -183,7 +184,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: 'undefined',
       description: '行数据'
     })
-    item?: object): void {}
+    item?: object): void { }
     constructor(options?: Partial<UTableViewOptions<T, V, P, M>>) {
       super();
     }
@@ -316,9 +317,9 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       order: nasl.core.String;
       compare?: Function;
     } = {
-      field: undefined,
-      order: 'desc'
-    };
+        field: undefined,
+        order: 'desc'
+      };
     @Prop({
       group: '数据属性',
       title: '排序',
@@ -591,6 +592,38 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       }
     })
     resizable: nasl.core.Boolean = false;
+    @Prop({
+      group: '交互属性',
+      title: '启用 Excel 模式',
+      description: '开启后切换为 Excel 式单元格展示与选区交互，支持复制/粘贴、删除、撤销与重做',
+      docDescription: '开启后以字段值文本展示数据格（不渲染列模板内表单），单击选中、双击或输入编辑，支持 Ctrl/Cmd+C/V、Delete、Ctrl/Cmd+Z 撤销与 Ctrl/Cmd+Shift+Z/Ctrl/Cmd+Y 重做',
+      setter: {
+        concept: 'SwitchSetter'
+      }
+    })
+    excelMode: nasl.core.Boolean = false;
+    @Prop<UTableViewOptions<T, V, P, M>, 'excelModeUndoMax'>({
+      group: '交互属性',
+      title: 'Excel 模式撤销与重做最大步数',
+      description: 'Excel 模式下写操作（粘贴/删除）的撤销与重做栈各自的最大深度',
+      setter: {
+        concept: 'NumberInputSetter',
+        precision: 0
+      },
+      if: _ => _.excelMode === true
+    })
+    excelModeUndoMax: nasl.core.Integer = 20;
+    @Prop<UTableViewOptions<T, V, P, M>, 'excelModeSelectionColor'>({
+      group: '交互属性',
+      title: 'Excel 选区颜色',
+      description: 'Excel 模式下选区框边框与单元格编辑态边框颜色',
+      docDescription: '设置选区 overlay 边框颜色；同时作用于行内编辑 input 边框。默认 #337eff',
+      setter: {
+        concept: 'InputSetter'
+      },
+      if: _ => _.excelMode === true
+    })
+    excelModeSelectionColor: nasl.core.String = '#337eff';
     @Prop({
       group: '交互属性',
       title: '调整列宽效果',
@@ -1134,6 +1167,49 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       item: T;
       expanded: nasl.core.Boolean;
     }) => any;
+    @Event({
+      title: 'Excel 粘贴完成',
+      description: '从 Excel 粘贴数据成功后触发'
+    })
+    onExcelPaste: (event: {
+      rows: nasl.collection.List<T>;
+      newRows: nasl.collection.List<T>;
+      pasteData: nasl.collection.List<nasl.collection.List<nasl.core.String>>;
+      selection: object;
+    }) => any;
+    @Event({
+      title: 'Excel 删除完成',
+      description: '按 Delete / Backspace 删除（清空）选区内可粘贴单元格内容后触发'
+    })
+    onExcelDelete: (event: {
+      rows: nasl.collection.List<T>;
+      newRows: nasl.collection.List<T>;
+      pasteData: nasl.collection.List<nasl.collection.List<nasl.core.String>>;
+      selection: object;
+    }) => any;
+    @Event({
+      title: 'Excel 复制完成',
+      description: '将当前选区导出为 TSV 并写入剪贴板后触发'
+    })
+    onExcelCopy: (event: {
+      copyData: nasl.collection.List<nasl.collection.List<nasl.core.String>>;
+      tsv: nasl.core.String;
+      selection: object;
+    }) => any;
+    @Event({
+      title: 'Excel 撤销',
+      description: '撤销最近一次 Excel 粘贴或清空操作后触发'
+    })
+    onExcelUndo: (event: {
+      snapshot: object;
+    }) => any;
+    @Event({
+      title: 'Excel 重做',
+      description: '重做最近一次撤销的 Excel 粘贴或清空操作后触发'
+    })
+    onExcelRedo: (event: {
+      snapshot: object;
+    }) => any;
     @Slot({
       title: '默认',
       description: '在表格中插入`<u-table-view-column>`子组件',
@@ -1147,7 +1223,7 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       }, {
         title: '表格列分组',
         code: '<u-table-view-column-group> <template #title><el-text text="表格列分组"></el-text></template> <u-table-view-column> <template #cell="current"></template> <template #title><el-text text="表格列"></el-text></template> <template #expander="current"><u-table-view-expander :item="current.item" @toggle="current.toggle"></u-table-view-expander></template> </u-table-view-column> </u-table-view-column-group>'
-      }, 
+      },
       {
         title: '表格列2',
         code: '<u-table-view-column> <template #cell="current"></template> <template #title><u-text text="表格列"></u-text></template> <template #expander="current"><u-table-view-expander :item="current.item" @toggle="current.toggle"></u-table-view-expander></template> </u-table-view-column>'
@@ -1407,6 +1483,29 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       }
     })
     autoRowSpan: nasl.core.Boolean = false;
+
+    @Prop({
+      group: '样式属性',
+      title: '表头位置',
+      docDescription: '表头位置，默认居中',
+      setter: {
+        concept: 'EnumSelectSetter',
+        options: [{ title: '居左' }, { title: '居中' }, { title: '居右' }],
+      },
+    })
+    thtextalign: 'left' | 'center' | 'right' = 'center';
+
+    @Prop({
+      group: '样式属性',
+      title: '单元格位置',
+      docDescription: '单元格位置，默认居中',
+      setter: {
+        concept: 'EnumSelectSetter',
+        options: [{ title: '居左' }, { title: '居中' }, { title: '居右' }],
+      },
+    })
+    tdtextalign: 'left' | 'center' | 'right' = 'left';
+
     @Slot({
       title: '单元格',
       description: '对单元格的数据展示进行自定义'
@@ -1681,6 +1780,34 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       docDescription: '指定列宽，可以是数字或百分比，如100，或10%。'
     })
     width: nasl.core.String | nasl.core.Decimal | nasl.core.Integer;
+
+    @Prop({
+      group: '样式属性',
+      title: '表头位置',
+      docDescription: '表头位置，默认居中',
+      setter: {
+        concept: 'EnumSelectSetter',
+        options: [{ title: '居左' }, { title: '居中' }, { title: '居右' }],
+      },
+    })
+    thtextalign: 'left' | 'center' | 'right' = 'center';
+
+    @Prop({
+      group: '样式属性',
+      title: '单元格位置',
+      docDescription: '单元格位置，默认居中',
+      setter: {
+        concept: 'EnumSelectSetter',
+        options: [{ title: '居左' }, { title: '居中' }, { title: '居右' }],
+      },
+    })
+    tdtextalign: 'left' | 'center' | 'right' = 'left';
+
+    @Prop({
+      title: '是否可配置显示与否'
+    })
+    inColumnConfig: nasl.core.Boolean = true;
+
     @Slot({
       title: '配置列展示title'
     })
@@ -1723,6 +1850,20 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       title: '表格标题'
     })
     private title: nasl.core.String;
+
+    @Prop({
+      group: '样式属性',
+      title: '表头位置',
+      docDescription: '表头位置，默认居中',
+      setter: {
+        concept: 'EnumSelectSetter',
+        options: [{ title: '居左' }, { title: '居中' }, { title: '居右' }],
+      },
+    })
+    thtextalign: 'left' | 'center' | 'right' = 'center';
+
+
+
     @Slot({
       title: '默认',
       description: '在表格中插入`<u-table-view-column>`子组件',
@@ -1730,6 +1871,9 @@ namespace extensions.cw_eu_extend_cu_library.viewComponents {
       snippets: [{
         title: '表格列',
         code: '<u-table-view-column><template #cell="current"></template><template #title><el-text text="表格列"></el-text></template></u-table-view-column>'
+      }, {
+        title: '表格列分组',
+        code: '<u-table-view-column-group> <template #title><el-text text="表格列分组"></el-text></template> <u-table-view-column> <template #cell="current"></template> <template #title><el-text text="表格列"></el-text></template> <template #expander="current"><u-table-view-expander :item="current.item" @toggle="current.toggle"></u-table-view-expander></template> </u-table-view-column> </u-table-view-column-group>'
       }, {
         title: '表格动态列',
         code: '<u-table-view-column-dynamic><template #cell="current"></template><template #title="current"><el-text text="表格动态列"></el-text></template></u-table-view-column-dynamic>'
